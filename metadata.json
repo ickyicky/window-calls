@@ -4,5 +4,7 @@
   "uuid": "window-calls@domandoman.xyz",
   "shell-version": [
     "41"
-  ]
+  ],
+  "version": 1,
+  "url": "https://github.com/ickyicky/window-calls"
 }
