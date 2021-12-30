@@ -1,0 +1,8 @@
+{
+  "name": "Window Calls",
+  "description": "Add new dbus call for windows to get windows list and some of theirs properties",
+  "uuid": "window-calls@domandoman.xyz",
+  "shell-version": [
+    "41"
+  ]
+}
