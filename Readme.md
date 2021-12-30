@@ -6,7 +6,9 @@ Credit to [dceee](https://github.com/dceee) for providing example code in [this 
 
 ## Usage
 
-Enable extension and:
+Install extension from [gnome extensions page](https://extensions.gnome.org/extension/4724/window-calls/).
+
+To get all active windows simply run from terminal:
 
 ```sh
 gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List
