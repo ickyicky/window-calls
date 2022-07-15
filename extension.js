@@ -26,6 +26,10 @@ const MR_DBUS_IFACE = `
         <method name="List">
             <arg type="s" direction="out" name="win"/>
         </method>
+				<method name="MoveToWorkspace">
+            <arg type="u" direction="in" name="winid"/>
+            <arg type="u" direction="in" name="workspaceNum"/>
+        </method>
     </interface>
 </node>`;
 
@@ -47,6 +51,15 @@ class Extension {
             .map(w => ({ class: w.get_wm_class(), pid: w.get_pid(), id: w.get_id(), maximized: w.get_maximized(), focus: w.has_focus(), title: w.get_title()}));
         return JSON.stringify(win);
     }
+    MoveToWorkspace(winid, workspaceNum) {
+        let win = global.get_window_actors().map(a=>a.meta_window).find(w=>w.get_id()==winid);
+				let workspaceManager = global.workspace_manager;
+        if (win) {
+           win.change_workspace_by_index(workspaceNum, false);
+           } else {
+            throw new Error('Not found');
+        }
+		}
 }
 
 function init() {

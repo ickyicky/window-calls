@@ -3,8 +3,8 @@
   "description": "Add new dbus call for windows to get windows list and some of theirs properties",
   "uuid": "window-calls@domandoman.xyz",
   "shell-version": [
-    "41"
+    "42"
   ],
-  "version": 1.1,
+  "version": 1.2,
   "url": "https://github.com/ickyicky/window-calls"
 }
