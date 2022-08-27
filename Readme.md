@@ -4,7 +4,9 @@ This extension allows you to list current windows with some of their properties 
 
 Also, it allows you to move given window to different workspace.
 
-Credit to [dceee](https://github.com/dceee) for providing example code in [this discussion](https://gist.github.com/rbreaves/257c3edfa301786e66e964d7ac036269).
+Credit to [dceee](https://github.com/dceee) for providing example code in [this discussion](https://gist.github.com/rbreaves/257c3edfa301786e66e964d7ac036269)
+and to [blueray453](https://github.com/blueray453) for requesting additional functions and providing code example for additional properties returned by List
+method in [issue #1](https://github.com/ickyicky/window-calls/issues/1);
 
 ## Usage
 
