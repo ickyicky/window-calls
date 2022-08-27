@@ -30,6 +30,41 @@ const MR_DBUS_IFACE = `
             <arg type="u" direction="in" name="winid"/>
             <arg type="u" direction="in" name="workspaceNum"/>
         </method>
+			  <method name="MoveResize">
+            <arg type="u" direction="in" name="winid"/>
+            <arg type="u" direction="in" name="width"/>
+            <arg type="u" direction="in" name="height"/>
+            <arg type="u" direction="in" name="x"/>
+            <arg type="u" direction="in" name="y"/>
+        </method>
+			  <method name="Resize">
+            <arg type="u" direction="in" name="winid"/>
+            <arg type="u" direction="in" name="width"/>
+            <arg type="u" direction="in" name="height"/>
+        </method>
+			  <method name="Move">
+            <arg type="u" direction="in" name="winid"/>
+            <arg type="u" direction="in" name="x"/>
+            <arg type="u" direction="in" name="y"/>
+        </method>
+			  <method name="Maximize">
+            <arg type="u" direction="in" name="winid"/>
+        </method>
+			  <method name="Minimize">
+            <arg type="u" direction="in" name="winid"/>
+        </method>
+			  <method name="Unmaximize">
+            <arg type="u" direction="in" name="winid"/>
+        </method>
+			  <method name="Unminimize">
+            <arg type="u" direction="in" name="winid"/>
+        </method>
+			  <method name="Activate">
+            <arg type="u" direction="in" name="winid"/>
+        </method>
+			  <method name="Close">
+            <arg type="u" direction="in" name="winid"/>
+        </method>
     </interface>
 </node>`;
 
@@ -45,18 +80,130 @@ class Extension {
         this._dbus.unexport();
         delete this._dbus;
     }
+
+	  _get_window_by_wid(winid) {
+        let win = global.get_window_actors().map(a=>a.meta_window).find(w=>w.get_id()==winid);
+		    return win;
+		}
+
     List() {
-        let win = global.get_window_actors()
-            .map(a => a.meta_window)
-            .map(w => ({ class: w.get_wm_class(), pid: w.get_pid(), id: w.get_id(), maximized: w.get_maximized(), focus: w.has_focus(), title: w.get_title()}));
-        return JSON.stringify(win);
+				let win = global.get_window_actors();
+
+        let workspaceManager = global.workspace_manager;
+        let currentmonitor = global.display.get_current_monitor();
+        let monitor = global.display.get_monitor_geometry(currentmonitor);
+
+        var winJsonArr = [];
+        win.forEach(function (w) {
+            winJsonArr.push({
+                class: w.meta_window.get_wm_class(),
+                class_instance: w.meta_window.get_wm_class_instance(),
+                pid: w.meta_window.get_pid(),
+                id: w.meta_window.get_id(),
+                width: w.get_width(),
+                height: w.get_height(),
+                x: w.get_x(),
+                y: w.get_y(),
+                maximized: w.meta_window.get_maximized(),
+                focus: w.meta_window.has_focus(),
+                title: w.meta_window.get_title(),
+                workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace()),
+                moveable: w.meta_window.allows_move(),
+                resizeable: w.meta_window.allows_resize(),
+                canclose: w.meta_window.can_close(),
+                canmaximize: w.meta_window.can_maximize(),
+                canminimize: w.meta_window.can_minimize(),
+                canshade: w.meta_window.can_shade(),
+                display: w.meta_window.get_display(),
+                frame_bounds: w.meta_window.get_frame_bounds(),
+                frame_type: w.meta_window.get_frame_type(),
+                window_type: w.meta_window.get_window_type(),
+                layer: w.meta_window.get_layer(),
+                monitor: w.meta_window.get_monitor(),
+                role: w.meta_window.get_role(),
+                area: w.meta_window.get_work_area_current_monitor(),
+                area_all: w.meta_window.get_work_area_all_monitors(),
+                area_cust: w.meta_window.get_work_area_for_monitor(currentmonitor)
+            });
+        })
+        return JSON.stringify(winJsonArr);
     }
     MoveToWorkspace(winid, workspaceNum) {
-        let win = global.get_window_actors().map(a=>a.meta_window).find(w=>w.get_id()==winid);
-				let workspaceManager = global.workspace_manager;
+			  let win = this._get_window_by_wid(winid);
         if (win) {
            win.change_workspace_by_index(workspaceNum, false);
            } else {
+            throw new Error('Not found');
+        }
+		}
+    MoveResize(winid, width, height, x, y) {
+			  let win = this._get_window_by_wid(winid);
+        if (win) {
+						win.move_resize_frame(0, w.get_x(), w.get_y(), width, height);
+           } else {
+            throw new Error('Not found');
+        }
+		}
+    Move(winid, x, y) {
+			  let win = this._get_window_by_wid(winid);
+				let workspaceManager = global.workspace_manager;
+        if (win) {
+						win.move_frame(0, x, y);
+           } else {
+            throw new Error('Not found');
+        }
+		}
+    Maximize(winid) {
+			  let win = this._get_window_by_wid(winid);
+				let workspaceManager = global.workspace_manager;
+        if (win) {
+						win.maximize();
+           } else {
+            throw new Error('Not found');
+        }
+		}
+    Minimize(winid) {
+			  let win = this._get_window_by_wid(winid);
+				let workspaceManager = global.workspace_manager;
+        if (win) {
+						win.minimize();
+           } else {
+            throw new Error('Not found');
+        }
+		}
+    Unmaximize(winid) {
+			  let win = this._get_window_by_wid(winid);
+				let workspaceManager = global.workspace_manager;
+        if (win) {
+						win.unmaximize();
+           } else {
+            throw new Error('Not found');
+        }
+		}
+    Unminimize(winid) {
+			  let win = this._get_window_by_wid(winid);
+				let workspaceManager = global.workspace_manager;
+        if (win) {
+						win.unminimize();
+           } else {
+            throw new Error('Not found');
+        }
+		}
+    Activate(winid) {
+			  let win = this._get_window_by_wid(winid);
+				let workspaceManager = global.workspace_manager;
+        if (win) {
+						win.activate(Math.floor(Date.now() / 1000));
+           } else {
+            throw new Error('Not found');
+        }
+		}
+    Close(winid) {
+			  let win = this._get_window_by_wid(winid);
+				let workspaceManager = global.workspace_manager;
+        if (win) {
+						win.delete(Math.floor(Date.now() / 1000));
+				} else {
             throw new Error('Not found');
         }
 		}
