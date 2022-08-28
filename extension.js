@@ -41,10 +41,10 @@ const MR_DBUS_IFACE = `
       </method>
       <method name="MoveResize">
          <arg type="u" direction="in" name="winid" />
-         <arg type="u" direction="in" name="width" />
-         <arg type="u" direction="in" name="height" />
          <arg type="u" direction="in" name="x" />
          <arg type="u" direction="in" name="y" />
+         <arg type="u" direction="in" name="width" />
+         <arg type="u" direction="in" name="height" />
       </method>
       <method name="Resize">
          <arg type="u" direction="in" name="winid" />
@@ -177,7 +177,7 @@ class Extension {
         }
     }
 
-    MoveResize(winid, width, height, x, y) {
+    MoveResize(winid, x, y, width, height) {
         let win = this._get_window_by_wid(winid);
         if (win) {
             win.meta_window.move_resize_frame(0, x, y, width, height);
@@ -186,10 +186,9 @@ class Extension {
         }
     }
 
-    Resize(winid, width, height, x, y) {
+    Resize(winid, width, height) {
         let win = this._get_window_by_wid(winid);
         if (win) {
-            win.unmaximize(3);
             win.meta_window.move_resize_frame(0, win.get_x(), win.get_y(), width, height);
         } else {
             throw new Error('Not found');
