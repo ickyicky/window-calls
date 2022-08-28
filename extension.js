@@ -99,11 +99,9 @@ class Extension {
         let win = global.get_window_actors();
 
         let workspaceManager = global.workspace_manager;
-        let currentmonitor = global.display.get_current_monitor();
-        let monitor = global.display.get_monitor_geometry(currentmonitor);
 
         var winJsonArr = [];
-        win.forEach(function(w) {
+        win.forEach(function (w) {
             winJsonArr.push({
                 wm_class: w.meta_window.get_wm_class(),
                 wm_class_instance: w.meta_window.get_wm_class_instance(),
@@ -115,8 +113,7 @@ class Extension {
                 height: w.get_height(),
                 x: w.get_x(),
                 y: w.get_y(),
-                in_current_workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace()),
-                monitor: w.meta_window.get_monitor()
+                in_current_workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace())
             });
         })
         return JSON.stringify(winJsonArr);
@@ -126,7 +123,7 @@ class Extension {
         let w = this._get_window_by_wid(winid);
         let workspaceManager = global.workspace_manager;
         let currentmonitor = global.display.get_current_monitor();
-        let monitor = global.display.get_monitor_geometry(currentmonitor);
+        // let monitor = global.display.get_monitor_geometry(currentmonitor);
         if (w) {
             return JSON.stringify({
                 wm_class: w.meta_window.get_wm_class(),
@@ -137,13 +134,13 @@ class Extension {
                 height: w.get_height(),
                 x: w.get_x(),
                 y: w.get_y(),
-                maximized: w.meta_window.get_maximized(),
                 focus: w.meta_window.has_focus(),
                 in_current_workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace()),
                 moveable: w.meta_window.allows_move(),
                 resizeable: w.meta_window.allows_resize(),
                 canclose: w.meta_window.can_close(),
                 canmaximize: w.meta_window.can_maximize(),
+                maximized: w.meta_window.get_maximized(),
                 canminimize: w.meta_window.can_minimize(),
                 canshade: w.meta_window.can_shade(),
                 display: w.meta_window.get_display(),
@@ -192,6 +189,7 @@ class Extension {
     Resize(winid, width, height, x, y) {
         let win = this._get_window_by_wid(winid);
         if (win) {
+            win.unmaximize(3);
             win.meta_window.move_resize_frame(0, win.get_x(), win.get_y(), width, height);
         } else {
             throw new Error('Not found');
@@ -200,7 +198,6 @@ class Extension {
 
     Move(winid, x, y) {
         let win = this._get_window_by_wid(winid).meta_window;
-        let workspaceManager = global.workspace_manager;
         if (win) {
             win.move_frame(0, x, y);
         } else {
@@ -210,9 +207,8 @@ class Extension {
 
     Maximize(winid) {
         let win = this._get_window_by_wid(winid).meta_window;
-        let workspaceManager = global.workspace_manager;
         if (win) {
-            win.maximize();
+            win.maximize(3);
         } else {
             throw new Error('Not found');
         }
@@ -220,7 +216,6 @@ class Extension {
 
     Minimize(winid) {
         let win = this._get_window_by_wid(winid).meta_window;
-        let workspaceManager = global.workspace_manager;
         if (win) {
             win.minimize();
         } else {
@@ -230,9 +225,8 @@ class Extension {
 
     Unmaximize(winid) {
         let win = this._get_window_by_wid(winid).meta_window;
-        let workspaceManager = global.workspace_manager;
         if (win) {
-            win.unmaximize();
+            win.unmaximize(3);
         } else {
             throw new Error('Not found');
         }
@@ -240,7 +234,6 @@ class Extension {
 
     Unminimize(winid) {
         let win = this._get_window_by_wid(winid).meta_window;
-        let workspaceManager = global.workspace_manager;
         if (win) {
             win.unminimize();
         } else {
@@ -250,7 +243,6 @@ class Extension {
 
     Activate(winid) {
         let win = this._get_window_by_wid(winid).meta_window;
-        let workspaceManager = global.workspace_manager;
         if (win) {
             win.activate(Math.floor(Date.now() / 1000));
         } else {
@@ -260,9 +252,9 @@ class Extension {
 
     Close(winid) {
         let win = this._get_window_by_wid(winid).meta_window;
-        let workspaceManager = global.workspace_manager;
         if (win) {
-            win.delete(Math.floor(Date.now() / 1000));
+            win.kill();
+            // win.delete(Math.floor(Date.now() / 1000));
         } else {
             throw new Error('Not found');
         }
