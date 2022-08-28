@@ -129,8 +129,8 @@ class Extension {
         let monitor = global.display.get_monitor_geometry(currentmonitor);
         if (w) {
             return JSON.stringify({
-                class: w.meta_window.get_wm_class(),
-                class_instance: w.meta_window.get_wm_class_instance(),
+                wm_class: w.meta_window.get_wm_class(),
+                wm_class_instance: w.meta_window.get_wm_class_instance(),
                 pid: w.meta_window.get_pid(),
                 id: w.meta_window.get_id(),
                 width: w.get_width(),
@@ -139,7 +139,7 @@ class Extension {
                 y: w.get_y(),
                 maximized: w.meta_window.get_maximized(),
                 focus: w.meta_window.has_focus(),
-                workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace()),
+                in_current_workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace()),
                 moveable: w.meta_window.allows_move(),
                 resizeable: w.meta_window.allows_resize(),
                 canclose: w.meta_window.can_close(),
