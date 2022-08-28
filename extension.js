@@ -17,8 +17,9 @@
  */
 
 /* exported init */
-
-const { Gio } = imports.gi;
+const {
+    Gio
+} = imports.gi;
 
 const MR_DBUS_IFACE = `
 <node>
@@ -89,45 +90,45 @@ class Extension {
         delete this._dbus;
     }
 
-	  _get_window_by_wid(winid) {
-        let win = global.get_window_actors().find(w=>w.meta_window.get_id()==winid);
-		    return win;
-		}
+    _get_window_by_wid(winid) {
+        let win = global.get_window_actors().find(w => w.meta_window.get_id() == winid);
+        return win;
+    }
 
     List() {
-				let win = global.get_window_actors();
+        let win = global.get_window_actors();
 
         let workspaceManager = global.workspace_manager;
         let currentmonitor = global.display.get_current_monitor();
         let monitor = global.display.get_monitor_geometry(currentmonitor);
 
         var winJsonArr = [];
-				win.forEach(function (w) {
+        win.forEach(function(w) {
             winJsonArr.push({
-              wm_class: w.meta_window.get_wm_class(),
-              wm_class_instance: w.meta_window.get_wm_class_instance(),
-              pid: w.meta_window.get_pid(),
-              id: w.meta_window.get_id(),
-              frame_type: w.meta_window.get_frame_type(),
-              window_type: w.meta_window.get_window_type(),
-              width: w.get_width(),
-              height: w.get_height(),
-              x: w.get_x(),
-              y: w.get_y(),
-              in_current_workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace()),
-							monitor: w.meta_window.get_monitor()
+                wm_class: w.meta_window.get_wm_class(),
+                wm_class_instance: w.meta_window.get_wm_class_instance(),
+                pid: w.meta_window.get_pid(),
+                id: w.meta_window.get_id(),
+                frame_type: w.meta_window.get_frame_type(),
+                window_type: w.meta_window.get_window_type(),
+                width: w.get_width(),
+                height: w.get_height(),
+                x: w.get_x(),
+                y: w.get_y(),
+                in_current_workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace()),
+                monitor: w.meta_window.get_monitor()
             });
         })
         return JSON.stringify(winJsonArr);
     }
 
     Details(winid) {
-			  let w = this._get_window_by_wid(winid);
+        let w = this._get_window_by_wid(winid);
         let workspaceManager = global.workspace_manager;
         let currentmonitor = global.display.get_current_monitor();
         let monitor = global.display.get_monitor_geometry(currentmonitor);
         if (w) {
-						return JSON.stringify({
+            return JSON.stringify({
                 class: w.meta_window.get_wm_class(),
                 class_instance: w.meta_window.get_wm_class_instance(),
                 pid: w.meta_window.get_pid(),
@@ -155,117 +156,117 @@ class Extension {
                 area: w.meta_window.get_work_area_current_monitor(),
                 area_all: w.meta_window.get_work_area_all_monitors(),
                 area_cust: w.meta_window.get_work_area_for_monitor(currentmonitor)
-							});
-           } else {
+            });
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 
     GetTitle(winid) {
-			  let w = this._get_window_by_wid(winid);
+        let w = this._get_window_by_wid(winid);
         if (w) {
-						return w.meta_window.get_title();
-           } else {
+            return w.meta_window.get_title();
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 
     MoveToWorkspace(winid, workspaceNum) {
-			  let win = this._get_window_by_wid(winid).meta_window;
+        let win = this._get_window_by_wid(winid).meta_window;
         if (win) {
-           win.change_workspace_by_index(workspaceNum, false);
-           } else {
+            win.change_workspace_by_index(workspaceNum, false);
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 
     MoveResize(winid, width, height, x, y) {
-			  let win = this._get_window_by_wid(winid);
+        let win = this._get_window_by_wid(winid);
         if (win) {
-						win.meta_window.move_resize_frame(0, x, y, width, height);
-           } else {
+            win.meta_window.move_resize_frame(0, x, y, width, height);
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 
     Resize(winid, width, height, x, y) {
-			  let win = this._get_window_by_wid(winid);
+        let win = this._get_window_by_wid(winid);
         if (win) {
-						win.meta_window.move_resize_frame(0, win.get_x(), win.get_y(), width, height);
-           } else {
+            win.meta_window.move_resize_frame(0, win.get_x(), win.get_y(), width, height);
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 
     Move(winid, x, y) {
-			  let win = this._get_window_by_wid(winid).meta_window;
-				let workspaceManager = global.workspace_manager;
+        let win = this._get_window_by_wid(winid).meta_window;
+        let workspaceManager = global.workspace_manager;
         if (win) {
-						win.move_frame(0, x, y);
-           } else {
+            win.move_frame(0, x, y);
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 
     Maximize(winid) {
-			  let win = this._get_window_by_wid(winid).meta_window;
-				let workspaceManager = global.workspace_manager;
+        let win = this._get_window_by_wid(winid).meta_window;
+        let workspaceManager = global.workspace_manager;
         if (win) {
-						win.maximize();
-           } else {
+            win.maximize();
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 
     Minimize(winid) {
-			  let win = this._get_window_by_wid(winid).meta_window;
-				let workspaceManager = global.workspace_manager;
+        let win = this._get_window_by_wid(winid).meta_window;
+        let workspaceManager = global.workspace_manager;
         if (win) {
-						win.minimize();
-           } else {
+            win.minimize();
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 
     Unmaximize(winid) {
-			  let win = this._get_window_by_wid(winid).meta_window;
-				let workspaceManager = global.workspace_manager;
+        let win = this._get_window_by_wid(winid).meta_window;
+        let workspaceManager = global.workspace_manager;
         if (win) {
-						win.unmaximize();
-           } else {
+            win.unmaximize();
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 
     Unminimize(winid) {
-			  let win = this._get_window_by_wid(winid).meta_window;
-				let workspaceManager = global.workspace_manager;
+        let win = this._get_window_by_wid(winid).meta_window;
+        let workspaceManager = global.workspace_manager;
         if (win) {
-						win.unminimize();
-           } else {
+            win.unminimize();
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 
     Activate(winid) {
-			  let win = this._get_window_by_wid(winid).meta_window;
-				let workspaceManager = global.workspace_manager;
+        let win = this._get_window_by_wid(winid).meta_window;
+        let workspaceManager = global.workspace_manager;
         if (win) {
-						win.activate(Math.floor(Date.now() / 1000));
-           } else {
+            win.activate(Math.floor(Date.now() / 1000));
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 
     Close(winid) {
-			  let win = this._get_window_by_wid(winid).meta_window;
-				let workspaceManager = global.workspace_manager;
+        let win = this._get_window_by_wid(winid).meta_window;
+        let workspaceManager = global.workspace_manager;
         if (win) {
-						win.delete(Math.floor(Date.now() / 1000));
-				} else {
+            win.delete(Math.floor(Date.now() / 1000));
+        } else {
             throw new Error('Not found');
         }
-		}
+    }
 }
 
 function init() {
