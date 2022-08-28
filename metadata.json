@@ -1,10 +1,10 @@
 {
   "name": "Window Calls",
-  "description": "Add new dbus call for windows to get windows list and some of theirs properties",
+  "description": "Adds dbus calls which can return list of windows, move, resize, close them etc",
   "uuid": "window-calls@domandoman.xyz",
   "shell-version": [
     "42"
   ],
-  "version": 1.3,
+  "version": 1.4,
   "url": "https://github.com/ickyicky/window-calls"
 }
