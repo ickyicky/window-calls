@@ -179,7 +179,12 @@ class Extension {
 
     MoveResize(winid, x, y, width, height) {
         let win = this._get_window_by_wid(winid);
+
         if (win) {
+            if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
+                win.meta_window.unmaximize(3);
+            }
+
             win.meta_window.move_resize_frame(0, x, y, width, height);
         } else {
             throw new Error('Not found');
@@ -189,6 +194,9 @@ class Extension {
     Resize(winid, width, height) {
         let win = this._get_window_by_wid(winid);
         if (win) {
+            if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
+                win.meta_window.unmaximize(3);
+            }
             win.meta_window.move_resize_frame(0, win.get_x(), win.get_y(), width, height);
         } else {
             throw new Error('Not found');
@@ -198,6 +206,9 @@ class Extension {
     Move(winid, x, y) {
         let win = this._get_window_by_wid(winid).meta_window;
         if (win) {
+            if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
+                win.meta_window.unmaximize(3);
+            }
             win.move_frame(0, x, y);
         } else {
             throw new Error('Not found');
