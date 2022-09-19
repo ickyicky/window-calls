@@ -104,6 +104,14 @@ Resizing and moving can be done either together or separetely. There are 3 metho
 2. `MoveResize` which takes 3 parameters: winid x y width height
 3. `Move` which takes 3 parameters: winid x y
 
+#### Negative parameter values
+
+When calling `Move` or `MoveResize` you sometimes want to pass negative x or y value. In order to do so, you need to add `~~` before arguments in gdbus call like so:
+
+```sh
+gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.Move ~~ 12345678908 -32 -13
+```
+
 ### Maximizing, minimizing, activating, closing
 
 Ther are 6 methods providing such functionality:

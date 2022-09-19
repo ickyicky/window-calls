@@ -41,8 +41,8 @@ const MR_DBUS_IFACE = `
       </method>
       <method name="MoveResize">
          <arg type="u" direction="in" name="winid" />
-         <arg type="u" direction="in" name="x" />
-         <arg type="u" direction="in" name="y" />
+         <arg type="i" direction="in" name="x" />
+         <arg type="i" direction="in" name="y" />
          <arg type="u" direction="in" name="width" />
          <arg type="u" direction="in" name="height" />
       </method>
@@ -53,8 +53,8 @@ const MR_DBUS_IFACE = `
       </method>
       <method name="Move">
          <arg type="u" direction="in" name="winid" />
-         <arg type="u" direction="in" name="x" />
-         <arg type="u" direction="in" name="y" />
+         <arg type="i" direction="in" name="x" />
+         <arg type="i" direction="in" name="y" />
       </method>
       <method name="Maximize">
          <arg type="u" direction="in" name="winid" />
@@ -185,7 +185,7 @@ class Extension {
                 win.meta_window.unmaximize(3);
             }
 
-            win.meta_window.move_resize_frame(0, x, y, width, height);
+            win.meta_window.move_resize_frame(1, x, y, width, height);
         } else {
             throw new Error('Not found');
         }
@@ -197,19 +197,19 @@ class Extension {
             if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
                 win.meta_window.unmaximize(3);
             }
-            win.meta_window.move_resize_frame(0, win.get_x(), win.get_y(), width, height);
+            win.meta_window.move_resize_frame(1, win.get_x(), win.get_y(), width, height);
         } else {
             throw new Error('Not found');
         }
     }
 
     Move(winid, x, y) {
-        let win = this._get_window_by_wid(winid).meta_window;
+        let win = this._get_window_by_wid(winid);
         if (win) {
             if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
                 win.meta_window.unmaximize(3);
             }
-            win.move_frame(0, x, y);
+            win.meta_window.move_frame(1, x, y);
         } else {
             throw new Error('Not found');
         }
