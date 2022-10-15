@@ -254,7 +254,7 @@ class Extension {
     Activate(winid) {
         let win = this._get_window_by_wid(winid).meta_window;
         if (win) {
-            win.activate(Math.floor(Date.now() / 1000));
+            win.activate(0);
         } else {
             throw new Error('Not found');
         }
