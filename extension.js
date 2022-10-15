@@ -113,6 +113,7 @@ class Extension {
                 height: w.get_height(),
                 x: w.get_x(),
                 y: w.get_y(),
+                focus: w.meta_window.has_focus(),
                 in_current_workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace())
             });
         })
