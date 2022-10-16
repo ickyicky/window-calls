@@ -113,6 +113,7 @@ class Extension {
                 height: w.get_height(),
                 x: w.get_x(),
                 y: w.get_y(),
+                focus: w.meta_window.has_focus(),
                 in_current_workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace())
             });
         })
@@ -254,7 +255,7 @@ class Extension {
     Activate(winid) {
         let win = this._get_window_by_wid(winid).meta_window;
         if (win) {
-            win.activate(Math.floor(Date.now() / 1000));
+            win.activate(0);
         } else {
             throw new Error('Not found');
         }
