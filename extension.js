@@ -18,7 +18,7 @@
 
 /* exported init */
 const {
-    Gio
+  Gio
 } = imports.gi;
 
 const MR_DBUS_IFACE = `
@@ -79,199 +79,193 @@ const MR_DBUS_IFACE = `
 
 
 class Extension {
-    enable() {
-        this._dbus = Gio.DBusExportedObject.wrapJSObject(MR_DBUS_IFACE, this);
-        this._dbus.export(Gio.DBus.session, '/org/gnome/Shell/Extensions/Windows');
+  enable() {
+    this._dbus = Gio.DBusExportedObject.wrapJSObject(MR_DBUS_IFACE, this);
+    this._dbus.export(Gio.DBus.session, '/org/gnome/Shell/Extensions/Windows');
+  }
+
+  disable() {
+    this._dbus.flush();
+    this._dbus.unexport();
+    delete this._dbus;
+  }
+
+  _get_window_by_wid(winid) {
+    let win = global.get_window_actors().find(w => w.meta_window.get_id() == winid);
+    return win;
+  }
+
+  Details(winid) {
+    const w = this._get_window_by_wid(winid);
+
+    if (!w) {
+      throw new Error('Not found');
     }
 
-    disable() {
-        this._dbus.flush();
-        this._dbus.unexport();
-        delete this._dbus;
+    const workspaceManager = global.workspace_manager;
+    const currentmonitor = global.display.get_current_monitor();
+    // const monitor = global.display.get_monitor_geometry(currentmonitor);
+
+    const props = {
+      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'width', 'height', 'x', 'y', 'maximized', 'display', 'frame_bounds', 'frame_type', 'window_type', 'layer', 'monitor', 'role'],
+      can: ['close', 'maximize', 'minimize'],
+      has: ['focus'],
+      custom: new Map([
+        ['moveable', 'allows_move'],
+        ['resizeable', 'allows_resize'],
+        ['area', 'get_work_area_current_monitor'],
+        ['area_all', 'get_work_area_all_monitors']
+      ])
+    };
+
+    const win = {
+      in_current_workspace: w.meta_window.located_on_workspace?.(workspaceManager.get_active_workspace?.()),
+      area_cust: w.meta_window.get_work_area_for_monitor?.(currentmonitor)
+    };
+
+    props.get.forEach(name => win[name] = w.meta_window[`get_${name}`]?.());
+    props.can.forEach(name => win[`can${name}`] = w.meta_window[`can_${name}`]?.());
+    props.has.forEach(name => win[name] = w.meta_window[`has_${name}`]?.());
+    props.custom.forEach((fname, name) => { win[name] = w.meta_window[fname]?.() });
+
+    return JSON.stringify(win);
+  }
+
+  List() {
+    const win = global.get_window_actors();
+    const workspaceManager = global.workspace_manager;
+
+    const props = {
+      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'frame_type', 'window_type', 'width', 'height', 'x', 'y'],
+      has: ['focus'],
+      // custom: new Map([])
+    };
+
+    const winJsonArr = win.map(w => {
+      const win = {
+        in_current_workspace: w.meta_window.located_on_workspace?.(workspaceManager.get_active_workspace?.())
+      };
+      props.get.forEach(name => win[name] = w.meta_window[`get_${name}`]?.());
+      props.has.forEach(name => win[name] = w.meta_window[`has_${name}`]?.());
+      // props.custom.forEach((fname, name) => { win[name] = w.meta_window[fname]?.() });
+      return win;
+    });
+
+    return JSON.stringify(winJsonArr);
+  }
+
+  GetTitle(winid) {
+    let w = this._get_window_by_wid(winid);
+    if (w) {
+      return w.meta_window.get_title();
+    } else {
+      throw new Error('Not found');
     }
+  }
 
-    _get_window_by_wid(winid) {
-        let win = global.get_window_actors().find(w => w.meta_window.get_id() == winid);
-        return win;
+  MoveToWorkspace(winid, workspaceNum) {
+    let win = this._get_window_by_wid(winid).meta_window;
+    if (win) {
+      win.change_workspace_by_index(workspaceNum, false);
+    } else {
+      throw new Error('Not found');
     }
+  }
 
-    List() {
-        let win = global.get_window_actors();
+  MoveResize(winid, x, y, width, height) {
+    let win = this._get_window_by_wid(winid);
 
-        let workspaceManager = global.workspace_manager;
+    if (win) {
+      if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
+        win.meta_window.unmaximize(3);
+      }
 
-        var winJsonArr = [];
-        win.forEach(function (w) {
-            winJsonArr.push({
-                wm_class: w.meta_window.get_wm_class(),
-                wm_class_instance: w.meta_window.get_wm_class_instance(),
-                pid: w.meta_window.get_pid(),
-                id: w.meta_window.get_id(),
-                frame_type: w.meta_window.get_frame_type(),
-                window_type: w.meta_window.get_window_type(),
-                width: w.get_width(),
-                height: w.get_height(),
-                x: w.get_x(),
-                y: w.get_y(),
-                focus: w.meta_window.has_focus(),
-                in_current_workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace())
-            });
-        })
-        return JSON.stringify(winJsonArr);
+      win.meta_window.move_resize_frame(1, x, y, width, height);
+    } else {
+      throw new Error('Not found');
     }
+  }
 
-    Details(winid) {
-        let w = this._get_window_by_wid(winid);
-        let workspaceManager = global.workspace_manager;
-        let currentmonitor = global.display.get_current_monitor();
-        // let monitor = global.display.get_monitor_geometry(currentmonitor);
-        if (w) {
-            return JSON.stringify({
-                wm_class: w.meta_window.get_wm_class(),
-                wm_class_instance: w.meta_window.get_wm_class_instance(),
-                pid: w.meta_window.get_pid(),
-                id: w.meta_window.get_id(),
-                width: w.get_width(),
-                height: w.get_height(),
-                x: w.get_x(),
-                y: w.get_y(),
-                focus: w.meta_window.has_focus(),
-                in_current_workspace: w.meta_window.located_on_workspace(workspaceManager.get_active_workspace()),
-                moveable: w.meta_window.allows_move(),
-                resizeable: w.meta_window.allows_resize(),
-                canclose: w.meta_window.can_close(),
-                canmaximize: w.meta_window.can_maximize(),
-                maximized: w.meta_window.get_maximized(),
-                canminimize: w.meta_window.can_minimize(),
-                canshade: w.meta_window.can_shade(),
-                display: w.meta_window.get_display(),
-                frame_bounds: w.meta_window.get_frame_bounds(),
-                frame_type: w.meta_window.get_frame_type(),
-                window_type: w.meta_window.get_window_type(),
-                layer: w.meta_window.get_layer(),
-                monitor: w.meta_window.get_monitor(),
-                role: w.meta_window.get_role(),
-                area: w.meta_window.get_work_area_current_monitor(),
-                area_all: w.meta_window.get_work_area_all_monitors(),
-                area_cust: w.meta_window.get_work_area_for_monitor(currentmonitor)
-            });
-        } else {
-            throw new Error('Not found');
-        }
+  Resize(winid, width, height) {
+    let win = this._get_window_by_wid(winid);
+    if (win) {
+      if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
+        win.meta_window.unmaximize(3);
+      }
+      win.meta_window.move_resize_frame(1, win.get_x(), win.get_y(), width, height);
+    } else {
+      throw new Error('Not found');
     }
+  }
 
-    GetTitle(winid) {
-        let w = this._get_window_by_wid(winid);
-        if (w) {
-            return w.meta_window.get_title();
-        } else {
-            throw new Error('Not found');
-        }
+  Move(winid, x, y) {
+    let win = this._get_window_by_wid(winid);
+    if (win) {
+      if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
+        win.meta_window.unmaximize(3);
+      }
+      win.meta_window.move_frame(1, x, y);
+    } else {
+      throw new Error('Not found');
     }
+  }
 
-    MoveToWorkspace(winid, workspaceNum) {
-        let win = this._get_window_by_wid(winid).meta_window;
-        if (win) {
-            win.change_workspace_by_index(workspaceNum, false);
-        } else {
-            throw new Error('Not found');
-        }
+  Maximize(winid) {
+    let win = this._get_window_by_wid(winid).meta_window;
+    if (win) {
+      win.maximize(3);
+    } else {
+      throw new Error('Not found');
     }
+  }
 
-    MoveResize(winid, x, y, width, height) {
-        let win = this._get_window_by_wid(winid);
-
-        if (win) {
-            if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
-                win.meta_window.unmaximize(3);
-            }
-
-            win.meta_window.move_resize_frame(1, x, y, width, height);
-        } else {
-            throw new Error('Not found');
-        }
+  Minimize(winid) {
+    let win = this._get_window_by_wid(winid).meta_window;
+    if (win) {
+      win.minimize();
+    } else {
+      throw new Error('Not found');
     }
+  }
 
-    Resize(winid, width, height) {
-        let win = this._get_window_by_wid(winid);
-        if (win) {
-            if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
-                win.meta_window.unmaximize(3);
-            }
-            win.meta_window.move_resize_frame(1, win.get_x(), win.get_y(), width, height);
-        } else {
-            throw new Error('Not found');
-        }
+  Unmaximize(winid) {
+    let win = this._get_window_by_wid(winid).meta_window;
+    if (win) {
+      win.unmaximize(3);
+    } else {
+      throw new Error('Not found');
     }
+  }
 
-    Move(winid, x, y) {
-        let win = this._get_window_by_wid(winid);
-        if (win) {
-            if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
-                win.meta_window.unmaximize(3);
-            }
-            win.meta_window.move_frame(1, x, y);
-        } else {
-            throw new Error('Not found');
-        }
+  Unminimize(winid) {
+    let win = this._get_window_by_wid(winid).meta_window;
+    if (win) {
+      win.unminimize();
+    } else {
+      throw new Error('Not found');
     }
+  }
 
-    Maximize(winid) {
-        let win = this._get_window_by_wid(winid).meta_window;
-        if (win) {
-            win.maximize(3);
-        } else {
-            throw new Error('Not found');
-        }
+  Activate(winid) {
+    let win = this._get_window_by_wid(winid).meta_window;
+    if (win) {
+      win.activate(0);
+    } else {
+      throw new Error('Not found');
     }
+  }
 
-    Minimize(winid) {
-        let win = this._get_window_by_wid(winid).meta_window;
-        if (win) {
-            win.minimize();
-        } else {
-            throw new Error('Not found');
-        }
+  Close(winid) {
+    let win = this._get_window_by_wid(winid).meta_window;
+    if (win) {
+      win.kill();
+      // win.delete(Math.floor(Date.now() / 1000));
+    } else {
+      throw new Error('Not found');
     }
-
-    Unmaximize(winid) {
-        let win = this._get_window_by_wid(winid).meta_window;
-        if (win) {
-            win.unmaximize(3);
-        } else {
-            throw new Error('Not found');
-        }
-    }
-
-    Unminimize(winid) {
-        let win = this._get_window_by_wid(winid).meta_window;
-        if (win) {
-            win.unminimize();
-        } else {
-            throw new Error('Not found');
-        }
-    }
-
-    Activate(winid) {
-        let win = this._get_window_by_wid(winid).meta_window;
-        if (win) {
-            win.activate(0);
-        } else {
-            throw new Error('Not found');
-        }
-    }
-
-    Close(winid) {
-        let win = this._get_window_by_wid(winid).meta_window;
-        if (win) {
-            win.kill();
-            // win.delete(Math.floor(Date.now() / 1000));
-        } else {
-            throw new Error('Not found');
-        }
-    }
+  }
 }
 
 function init() {
-    return new Extension();
+  return new Extension();
 }
