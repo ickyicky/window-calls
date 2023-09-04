@@ -107,14 +107,18 @@ class Extension {
     // const monitor = global.display.get_monitor_geometry(currentmonitor);
 
     const props = {
-      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'width', 'height', 'x', 'y', 'maximized', 'display', 'frame_bounds', 'frame_type', 'window_type', 'layer', 'monitor', 'role'],
+      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'width', 'height', 'x', 'y', 'maximized', 'display', 'frame_bounds', 'frame_type', 'window_type', 'layer', 'monitor', 'role', 'title'],
       can: ['close', 'maximize', 'minimize'],
       has: ['focus'],
       custom: new Map([
         ['moveable', 'allows_move'],
         ['resizeable', 'allows_resize'],
         ['area', 'get_work_area_current_monitor'],
-        ['area_all', 'get_work_area_all_monitors']
+        ['area_all', 'get_work_area_all_monitors'],
+        ['canclose', 'can_close'],
+        ['canmaximize', 'can_maximize'],
+        ['canminimize', 'can_minimize'],
+        ['canshade', 'can_shade'],
       ])
     };
 
