@@ -56,6 +56,7 @@ gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Exten
 
 - `Details`, which returns detailed information about window in JSON format
 - `GetTitle`, which returns windows title. Title can contain special characters, which can break ceratin tools like `jq` when parsing JSON
+- `GetFrameBounds`, which returns windows frame bounds in JSON dictionary. This stopped working around Gnome 43, so I moved this property to additional callable function
 
 Both methods should be invoked giving desired window's id as a parameter. Example usages:
 
@@ -84,7 +85,6 @@ Example result of calling `Details`:
   "canminimize": true,
   "canshade": true,
   "display": {},
-  "frame_bounds": {},
   "frame_type": 0,
   "window_type": 0,
   "layer": 2,
