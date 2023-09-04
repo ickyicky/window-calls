@@ -35,6 +35,10 @@ const MR_DBUS_IFACE = `
          <arg type="u" direction="in" name="winid" />
          <arg type="s" direction="out" name="win" />
       </method>
+      <method name="GetFrameBounds">
+         <arg type="u" direction="in" name="winid" />
+         <arg type="s" direction="out" name="frameBounds" />
+      </method>
       <method name="MoveToWorkspace">
          <arg type="u" direction="in" name="winid" />
          <arg type="u" direction="in" name="workspaceNum" />
@@ -107,7 +111,7 @@ class Extension {
     // const monitor = global.display.get_monitor_geometry(currentmonitor);
 
     const props = {
-      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'width', 'height', 'x', 'y', 'maximized', 'display', 'frame_bounds', 'frame_type', 'window_type', 'layer', 'monitor', 'role', 'title'],
+      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'width', 'height', 'x', 'y', 'maximized', 'display', 'frame_type', 'window_type', 'layer', 'monitor', 'role', 'title'],
       can: ['close', 'maximize', 'minimize'],
       has: ['focus'],
       custom: new Map([
@@ -156,6 +160,18 @@ class Extension {
     });
 
     return JSON.stringify(winJsonArr);
+  }
+
+  GetFrameBounds(winid) {
+    let w = this._get_window_by_wid(winid);
+    if (w) {
+      const result = {
+        frame_bounds: w.meta_window.get_frame_bounds(),
+      }
+      return JSON.stringify(result);
+    } else {
+      throw new Error('Not found');
+    }
   }
 
   GetTitle(winid) {
