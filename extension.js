@@ -17,9 +17,8 @@
  */
 
 /* exported init */
-const {
-  Gio
-} = imports.gi;
+import Gio from 'gi://Gio';
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 const MR_DBUS_IFACE = `
 <node>
@@ -82,7 +81,7 @@ const MR_DBUS_IFACE = `
 </node>`;
 
 
-class Extension {
+export default class WindowCallsExtention extends Extension {
   enable() {
     this._dbus = Gio.DBusExportedObject.wrapJSObject(MR_DBUS_IFACE, this);
     this._dbus.export(Gio.DBus.session, '/org/gnome/Shell/Extensions/Windows');
@@ -284,8 +283,4 @@ class Extension {
       throw new Error('Not found');
     }
   }
-}
-
-function init() {
-  return new Extension();
 }
