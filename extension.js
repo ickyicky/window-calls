@@ -16,10 +16,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-/* exported init */
-const {
-  Gio
-} = imports.gi;
+import Gio from 'gi://Gio';
 
 const MR_DBUS_IFACE = `
 <node>
@@ -82,7 +79,7 @@ const MR_DBUS_IFACE = `
 </node>`;
 
 
-class Extension {
+export default class Extension {
   enable() {
     this._dbus = Gio.DBusExportedObject.wrapJSObject(MR_DBUS_IFACE, this);
     this._dbus.export(Gio.DBus.session, '/org/gnome/Shell/Extensions/Windows');
@@ -284,8 +281,4 @@ class Extension {
       throw new Error('Not found');
     }
   }
-}
-
-function init() {
-  return new Extension();
 }
