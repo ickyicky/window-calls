@@ -3,8 +3,9 @@
   "description": "Adds dbus calls which can return list of windows, move, resize, close them etc",
   "uuid": "window-calls@domandoman.xyz",
   "shell-version": [
-    "45"
+    "45",
+    "46"
   ],
-  "version": 1.10,
+  "version": 1.11,
   "url": "https://github.com/ickyicky/window-calls"
 }

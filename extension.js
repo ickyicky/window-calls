@@ -32,6 +32,10 @@ const MR_DBUS_IFACE = `
          <arg type="u" direction="in" name="winid" />
          <arg type="s" direction="out" name="win" />
       </method>
+      <method name="GetFrameRect">
+         <arg type="u" direction="in" name="winid" />
+         <arg type="s" direction="out" name="frameRect" />
+      </method>
       <method name="GetFrameBounds">
          <arg type="u" direction="in" name="winid" />
          <arg type="s" direction="out" name="frameBounds" />
@@ -108,7 +112,7 @@ export default class Extension {
     // const monitor = global.display.get_monitor_geometry(currentmonitor);
 
     const props = {
-      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'width', 'height', 'x', 'y', 'maximized', 'display', 'frame_type', 'window_type', 'layer', 'monitor', 'role', 'title'],
+      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'maximized', 'display', 'frame_type', 'window_type', 'layer', 'monitor', 'role', 'title'],
       can: ['close', 'maximize', 'minimize'],
       has: ['focus'],
       custom: new Map([
@@ -120,7 +124,8 @@ export default class Extension {
         ['canmaximize', 'can_maximize'],
         ['canminimize', 'can_minimize'],
         ['canshade', 'can_shade'],
-      ])
+      ]),
+      frame: ['x', 'y', 'width', 'height']
     };
 
     const win = {
@@ -132,7 +137,9 @@ export default class Extension {
     props.can.forEach(name => win[`can${name}`] = w.meta_window[`can_${name}`]?.());
     props.has.forEach(name => win[name] = w.meta_window[`has_${name}`]?.());
     props.custom.forEach((fname, name) => { win[name] = w.meta_window[fname]?.() });
-
+    let frame = w.meta_window.get_frame_rect();
+    props.frame.forEach(name => win[name] = frame[name]);
+    
     return JSON.stringify(win);
   }
 
@@ -164,6 +171,22 @@ export default class Extension {
     if (w) {
       const result = {
         frame_bounds: w.meta_window.get_frame_bounds(),
+      }
+      return JSON.stringify(result);
+    } else {
+      throw new Error('Not found');
+    }
+  }
+
+  GetFrameRect(winid) {
+    let w = this._get_window_by_wid(winid);
+    if (w) {
+      let frame = w.meta_window.get_frame_rect()
+      const result = {
+        "x": frame.x,
+        "y": frame.y,
+        "width": frame.width,
+        "height": frame.height
       }
       return JSON.stringify(result);
     } else {
