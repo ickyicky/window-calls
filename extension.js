@@ -32,6 +32,10 @@ const MR_DBUS_IFACE = `
          <arg type="u" direction="in" name="winid" />
          <arg type="s" direction="out" name="win" />
       </method>
+      <method name="GetFrameRect">
+         <arg type="u" direction="in" name="winid" />
+         <arg type="s" direction="out" name="frameRect" />
+      </method>
       <method name="GetFrameBounds">
          <arg type="u" direction="in" name="winid" />
          <arg type="s" direction="out" name="frameBounds" />
@@ -135,7 +139,7 @@ export default class Extension {
     props.custom.forEach((fname, name) => { win[name] = w.meta_window[fname]?.() });
     let frame = w.meta_window.get_frame_rect();
     props.frame.forEach(name => win[name] = frame[name]);
-
+    
     return JSON.stringify(win);
   }
 
@@ -167,6 +171,22 @@ export default class Extension {
     if (w) {
       const result = {
         frame_bounds: w.meta_window.get_frame_bounds(),
+      }
+      return JSON.stringify(result);
+    } else {
+      throw new Error('Not found');
+    }
+  }
+
+  GetFrameRect(winid) {
+    let w = this._get_window_by_wid(winid);
+    if (w) {
+      let frame = w.meta_window.get_frame_rect()
+      const result = {
+        "x": frame.x,
+        "y": frame.y,
+        "width": frame.width,
+        "height": frame.height
       }
       return JSON.stringify(result);
     } else {
