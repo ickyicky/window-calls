@@ -108,7 +108,7 @@ export default class Extension {
     // const monitor = global.display.get_monitor_geometry(currentmonitor);
 
     const props = {
-      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'width', 'height', 'x', 'y', 'maximized', 'display', 'frame_type', 'window_type', 'layer', 'monitor', 'role', 'title'],
+      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'maximized', 'display', 'frame_type', 'window_type', 'layer', 'monitor', 'role', 'title'],
       can: ['close', 'maximize', 'minimize'],
       has: ['focus'],
       custom: new Map([
@@ -120,7 +120,8 @@ export default class Extension {
         ['canmaximize', 'can_maximize'],
         ['canminimize', 'can_minimize'],
         ['canshade', 'can_shade'],
-      ])
+      ]),
+      frame: ['x', 'y', 'width', 'height']
     };
 
     const win = {
@@ -132,6 +133,8 @@ export default class Extension {
     props.can.forEach(name => win[`can${name}`] = w.meta_window[`can_${name}`]?.());
     props.has.forEach(name => win[name] = w.meta_window[`has_${name}`]?.());
     props.custom.forEach((fname, name) => { win[name] = w.meta_window[fname]?.() });
+    let frame = w.meta_window.get_frame_rect();
+    props.frame.forEach(name => win[name] = frame[name]);
 
     return JSON.stringify(win);
   }
