@@ -148,7 +148,7 @@ export default class Extension {
     const workspaceManager = global.workspace_manager;
 
     const props = {
-      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'frame_type', 'window_type', 'width', 'height', 'x', 'y'],
+      get: ['title', 'wm_class', 'wm_class_instance', 'pid', 'id', 'frame_type', 'window_type', 'width', 'height', 'x', 'y'],
       has: ['focus'],
       // custom: new Map([])
     };
