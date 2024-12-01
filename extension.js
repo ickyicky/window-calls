@@ -112,7 +112,7 @@ export default class Extension {
     // const monitor = global.display.get_monitor_geometry(currentmonitor);
 
     const props = {
-      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'maximized', 'display', 'frame_type', 'window_type', 'layer', 'monitor', 'role', 'title'],
+      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'maximized', 'display', 'frame_type', 'window_type', 'layer', 'monitor', 'role'],
       can: ['close', 'maximize', 'minimize'],
       has: ['focus'],
       custom: new Map([
@@ -148,7 +148,7 @@ export default class Extension {
     const workspaceManager = global.workspace_manager;
 
     const props = {
-      get: ['wm_class', 'wm_class_instance', 'title', 'pid', 'id', 'frame_type', 'window_type', 'width', 'height', 'x', 'y'],
+      get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'frame_type', 'window_type', 'width', 'height', 'x', 'y'],
       has: ['focus'],
       // custom: new Map([])
     };
