@@ -5,8 +5,9 @@
   "shell-version": [
     "45",
     "46",
-    "47"
+    "47",
+    "48"
   ],
-  "version": 1.12,
+  "version": 1.13,
   "url": "https://github.com/ickyicky/window-calls"
 }
