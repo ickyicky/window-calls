@@ -287,9 +287,14 @@ export default class Extension {
   }
 
   Activate(winid) {
-    let win = this._get_window_by_wid(winid).meta_window;
+    const win = this._get_window_by_wid(winid).meta_window;
     if (win) {
-      win.activate(0);
+      const workspace = win.get_workspace();
+      if (workspace) {
+        workspace.activate_with_focus(win, 0);
+      } else {
+        win.activate(0);
+      }
     } else {
       throw new Error('Not found');
     }
