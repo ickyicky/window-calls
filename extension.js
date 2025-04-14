@@ -303,8 +303,8 @@ export default class Extension {
   Close(winid) {
     let win = this._get_window_by_wid(winid).meta_window;
     if (win) {
-      win.kill();
-      // win.delete(Math.floor(Date.now() / 1000));
+      win.delete(global.get_current_time())
+      // win.kill();
     } else {
       throw new Error('Not found');
     }
