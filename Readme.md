@@ -61,7 +61,7 @@ gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Exten
 Both methods should be invoked giving desired window's id as a parameter. Example usages:
 
 ```sh
-gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.Details 2205525109
+gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.Details 2205525109
 ```
 
 Example result of calling `Details`:
@@ -127,37 +127,24 @@ Each takes only one parameter, winid.
 
 ## Using With `jq`
 
-You can realize the full power of this extension when you use it with `jq` or similar tool. As gdbus call returns its own structure, which is not JSON parsable, you need to use cut or gawk in order to retrieve pure JSON output from calls.
+You can realize the full power of this extension when you use it with `jq` or similar tool. As gdbus call returns its own structure, `--print-reply=literal` is needed.
 
 For example, To view all windows in json:
 ```sh
-gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | head -c -4 | tail -c +3 | jq .
+gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | jq .
 ```
 To get windowID of all windows in current workspace:
 ```sh
-gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | head -c -4 | tail -c +3 | jq -c '.[] | select (.in_current_workspace == true) | .id'
+gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | jq -c '.[] | select (.in_current_workspace == true) | .id'
 ```
 To get windowID and wm_class of all windows in current workspace:
 ```sh
-gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | head -c -4 | tail -c +3 | jq -c '[.[] | select (.in_current_workspace == true) | {id: .id,wm_class: .wm_class}]'
+gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | jq -c '[.[] | select (.in_current_workspace == true) | {id: .id,wm_class: .wm_class}]'
 ```
 To get windowID and wm_class of all visible window:
 ```sh
-gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | head -c -4 | tail -c +3 | jq -c '[.[] | select (.frame_type == 0 and .window_type == 0) | {id: .id,wm_class: .wm_class}]'
+gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | jq -c '[.[] | select (.frame_type == 0 and .window_type == 0) | {id: .id,wm_class: .wm_class}]'
 ```
 To get windowID and wm_class of all visible window in current workspace:
 ```sh
-gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | head -c -4 | tail -c +3 | jq -c '[.[] | select (.in_current_workspace == true and .frame_type == 0 and .window_type == 0) | {id: .id,wm_class: .wm_class}]' | jq .
-```
-### Calls using gawk
-
-You can also use gawk to capture desired JSON values. It has to be paired with sed in order to replace escaping done by qawk on quotes. For `List` gawk should look for JSON list:
-
-```sh
-dbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | gawk 'match($0, /\[.*\]/, a) {print a[0]}' | sed 's/\\"/"/g' | jq .
-```
-And for `Details` you want to find just one dictionary:
-
-```sh
-gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.Details 1610090767 | gawk 'match($0, /\{.*\}/, a) {print a[0]}' | sed 's/\\"/"/g' | jq .
-```
+gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | jq -c '[.[] | select (.in_current_workspace == true and .frame_type == 0 and .window_type == 0) | {id: .id,wm_class: .wm_class}]' | jq .
