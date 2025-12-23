@@ -79,6 +79,22 @@ const MR_DBUS_IFACE = `
       <method name="Close">
          <arg type="u" direction="in" name="winid" />
       </method>
+      <method name="GetWorkspaces">
+         <arg type="s" direction="out" name="workspaces" />
+      </method>
+      <method name="GetActiveWorkspace">
+         <arg type="u" direction="out" name="index" />
+      </method>
+      <method name="GetWorkspaceCount">
+         <arg type="u" direction="out" name="count" />
+      </method>
+      <method name="SwitchWorkspace">
+         <arg type="u" direction="in" name="index" />
+      </method>
+      <method name="GetWorkspaceWindows">
+         <arg type="u" direction="in" name="index" />
+         <arg type="s" direction="out" name="windows" />
+      </method>
    </interface>
 </node>`;
 
@@ -316,5 +332,62 @@ export default class Extension {
     } else {
       throw new Error('Not found');
     }
+  }
+
+  GetWorkspaces() {
+    const workspaceManager = global.workspace_manager;
+    const workspaces = [];
+    const count = workspaceManager.get_n_workspaces();
+    const activeIndex = workspaceManager.get_active_workspace_index();
+
+    for (let i = 0; i < count; i++) {
+      const ws = workspaceManager.get_workspace_by_index(i);
+      workspaces.push({
+        index: i,
+        active: i === activeIndex,
+        windows: ws.list_windows().length
+      });
+    }
+
+    return JSON.stringify(workspaces);
+  }
+
+  GetActiveWorkspace() {
+    return global.workspace_manager.get_active_workspace_index();
+  }
+
+  GetWorkspaceCount() {
+    return global.workspace_manager.get_n_workspaces();
+  }
+
+  SwitchWorkspace(index) {
+    const workspace = global.workspace_manager.get_workspace_by_index(index);
+    if (workspace) {
+      workspace.activate(global.get_current_time());
+    } else {
+      throw new Error('Workspace not found');
+    }
+  }
+
+  GetWorkspaceWindows(index) {
+    const workspace = global.workspace_manager.get_workspace_by_index(index);
+    if (!workspace) {
+      throw new Error('Workspace not found');
+    }
+
+    const windows = workspace.list_windows();
+    const props = {
+      get: ['wm_class', 'wm_class_instance', 'title', 'pid', 'id', 'frame_type', 'window_type'],
+      has: ['focus']
+    };
+
+    const winJsonArr = windows.map(w => {
+      const win = {};
+      props.get.forEach(name => win[name] = w[`get_${name}`]?.());
+      props.has.forEach(name => win[name] = w[`has_${name}`]?.());
+      return win;
+    });
+
+    return JSON.stringify(winJsonArr);
   }
 }
