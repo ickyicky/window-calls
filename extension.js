@@ -25,8 +25,15 @@ import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js'
 const MR_DBUS_IFACE = `
 <node>
    <interface name="org.gnome.Shell.Extensions.WindowCommander">
+      <method name="Activate">
+         <arg type="u" direction="in" name="winid" />
+      </method>
       <method name="List">
          <arg type="s" direction="out" name="windowList" />
+      </method>
+      <method name="GetTitle">
+         <arg type="u" direction="in" name="winid" />
+         <arg type="s" direction="out" name="title" />
       </method>
       <method name="GetDetails">
          <arg type="u" direction="in" name="winid" />
@@ -107,6 +114,22 @@ export default class WindowCommander extends Extension {
             y,
             width,
             height,
+        }
+    }
+
+    Activate(winid) {
+        const win = this._getWindowById(winid)?.meta_window
+        if (!win) {
+            throw new Error('Activate: Window not found')
+        }
+
+        const workspace = win.get_workspace()
+        const timestamp = global.get_current_time()
+
+        if (workspace) {
+            workspace.activate_with_focus(win, timestamp)
+        } else {
+            win.activate(timestamp)
         }
     }
 
