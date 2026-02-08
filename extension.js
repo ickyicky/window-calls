@@ -79,6 +79,12 @@ const MR_DBUS_IFACE = `
       <method name="Close">
          <arg type="u" direction="in" name="winid" />
       </method>
+      <method name="MakeAbove">
+         <arg type="u" direction="in" name="winid" />
+      </method>
+      <method name="UnmakeAbove">
+         <arg type="u" direction="in" name="winid" />
+      </method>
    </interface>
 </node>`;
 
@@ -313,6 +319,24 @@ export default class Extension {
     if (win) {
       win.delete(global.get_current_time())
       // win.kill();
+    } else {
+      throw new Error('Not found');
+    }
+  }
+
+  MakeAbove(winid) {
+    let win = this._get_window_by_wid(winid).meta_window;
+    if (win) {
+      win.make_above()
+    } else {
+      throw new Error('Not found');
+    }
+  }
+
+  UnmakeAbove(winid) {
+    let win = this._get_window_by_wid(winid).meta_window;
+    if (win) {
+      win.unmake_above()
     } else {
       throw new Error('Not found');
     }
