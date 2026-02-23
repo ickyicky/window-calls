@@ -115,6 +115,7 @@ export default class Extension {
       get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'maximized', 'display', 'frame_type', 'window_type', 'layer', 'monitor', 'role', 'title'],
       can: ['close', 'maximize', 'minimize'],
       has: ['focus'],
+      booleans: ['fullscreen', 'minimized'],
       custom: new Map([
         ['moveable', 'allows_move'],
         ['resizeable', 'allows_resize'],
@@ -134,6 +135,7 @@ export default class Extension {
     };
 
     props.get.forEach(name => win[name] = w.meta_window[`get_${name}`]?.());
+    props.booleans.forEach(name => win[name] = w.meta_window[name]);
     props.can.forEach(name => win[`can${name}`] = w.meta_window[`can_${name}`]?.());
     props.has.forEach(name => win[name] = w.meta_window[`has_${name}`]?.());
     props.custom.forEach((fname, name) => { win[name] = w.meta_window[fname]?.() });
