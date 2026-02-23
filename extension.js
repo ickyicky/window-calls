@@ -115,7 +115,7 @@ export default class Extension {
       get: ['wm_class', 'wm_class_instance', 'pid', 'id', 'maximized', 'display', 'frame_type', 'window_type', 'layer', 'monitor', 'role', 'title'],
       can: ['close', 'maximize', 'minimize'],
       has: ['focus'],
-      booleans: ['fullscreen', 'minimized'],
+      booleans: ['fullscreen', 'minimized', 'maximized_horizontally', 'maximized_vertically'],
       custom: new Map([
         ['moveable', 'allows_move'],
         ['resizeable', 'allows_resize'],
