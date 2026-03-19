@@ -56,7 +56,7 @@ gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Exten
 `List` method only returns basic information about the window. There are two more methods:
 
 - `Details`, which returns detailed information about window in JSON format
-- `GetTitle`, which returns windows title. Title can contain special characters, which can break ceratin tools like `jq` when parsing JSON
+- `GetTitle`, which returns windows title. Title can contain special characters, which can break certain tools like `jq` when parsing JSON
 - `GetFrameBounds`, which returns windows frame bounds in JSON dictionary. This stopped working around Gnome 43, so I moved this property to additional callable function
 
 Both methods should be invoked giving desired window's id as a parameter. Example usages:
