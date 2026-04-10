@@ -326,14 +326,14 @@ export default class WindowCommander extends Extension {
         if (width >= monitorWorkArea.width) {
             win.meta_window.move_resize_frame(true, x, y, monitorWorkArea.width, height)
             // Maximize horizontally
-            //win.meta_window.set_maximize_flags(1)
+            win.meta_window.set_maximize_flags(1)
             return
         }
 
         if (height >= monitorWorkArea.height) {
             win.meta_window.move_resize_frame(true, x, y, width, monitorWorkArea.height)
             // Maximize vertically
-            //win.meta_window.set_maximize_flags(2)
+            win.meta_window.set_maximize_flags(2)
             return
         }
 
