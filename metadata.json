@@ -3,8 +3,9 @@
     "description": "Provides a D-Bus interface for managing and controlling windows, including listing, resizing, moving, and workspace management",
     "uuid": "window-commander@gnikolaos.gr",
     "shell-version": [
-        "49"
+        "49",
+        "50"
     ],
-    "version": 9,
+    "version": 10,
     "url": "https://github.com/gnikolaos/window-commander"
 }
