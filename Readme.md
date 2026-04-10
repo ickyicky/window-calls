@@ -115,7 +115,7 @@ gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Exten
 
 ### Maximizing, minimizing, activating, closing
 
-Ther are 6 methods providing such functionality:
+Ther are 7 methods providing such functionality:
 
 1. `Maximize`
 2. `Minimize`
@@ -123,8 +123,9 @@ Ther are 6 methods providing such functionality:
 4. `Unminimize`
 5. `Activate`
 6. `Close`
+7. `MakeFullscreen`
 
-Each takes only one parameter, winid.
+Each takes only one parameter, `winid`.
 
 ## Using With `jq`
 
