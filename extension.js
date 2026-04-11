@@ -61,6 +61,9 @@ const MR_DBUS_IFACE = `
          <arg type="i" direction="in" name="x" />
          <arg type="i" direction="in" name="y" />
       </method>
+      <method name="MakeFullscreen">
+         <arg type="u" direction="in" name="winid" />
+      </method>
       <method name="Maximize">
          <arg type="u" direction="in" name="winid" />
       </method>
@@ -261,6 +264,15 @@ export default class Extension {
         win.meta_window.unmaximize(3);
       }
       win.meta_window.move_frame(1, x, y);
+    } else {
+      throw new Error('Not found');
+    }
+  }
+
+  MakeFullscreen(winid) {
+    let win = this._get_window_by_wid(winid).meta_window;
+    if (win) {
+      win.make_fullscreen();
     } else {
       throw new Error('Not found');
     }
