@@ -115,7 +115,7 @@ gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Exten
 
 ### Maximizing, minimizing, activating, closing
 
-Ther are 7 methods providing such functionality:
+There are 7 methods providing such functionality:
 
 1. `Maximize`
 2. `Minimize`
