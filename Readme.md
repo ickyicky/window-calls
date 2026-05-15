@@ -1,6 +1,6 @@
 # Window Calls
 
-This extension allows you to list current windows with some of their properties from command line, super usefull for Wayland to get current focused window.
+This extension allows you to list current windows with some of their properties from command line, super useful for Wayland to get current focused window.
 
 Also, it allows you to move given window to different workspace.
 
@@ -99,7 +99,7 @@ Example result of calling `Details`:
 
 ### Resizing and moving
 
-Resizing and moving can be done either together or separetely. There are 3 methods providing this functionality:
+Resizing and moving can be done either together or separately. There are 3 methods providing this functionality:
 
 1. `Resize` which takes 3 parameters: winid width height
 2. `MoveResize` which takes 3 parameters: winid x y width height
