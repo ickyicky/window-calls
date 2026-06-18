@@ -6,7 +6,7 @@ Also, it allows you to move given window to different workspace.
 
 Credit to [dceee](https://github.com/dceee) for providing example code in [this discussion](https://gist.github.com/rbreaves/257c3edfa301786e66e964d7ac036269)
 and to [blueray453](https://github.com/blueray453) for requesting additional functions and providing code example for additional properties returned by List
-method in [issue #1](https://github.com/ickyicky/window-calls/issues/1);
+method in [issue #1](https://github.com/ickyicky/window-calls/issues/1).
 
 ## Usage
 
@@ -19,7 +19,10 @@ Install extension from [gnome extensions page](https://extensions.gnome.org/exte
 To get all active windows simply run from terminal:
 
 ```sh
-gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List
+dbus-send --session --print-reply=literal \
+                    --dest=org.gnome.Shell \
+                    /org/gnome/Shell/Extensions/Windows \
+                    org.gnome.Shell.Extensions.Windows.List
 ```
 
 Call returns list of window properties. Example output:
@@ -62,7 +65,10 @@ gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell/Exten
 Both methods should be invoked giving desired window's id as a parameter. Example usages:
 
 ```sh
-gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.Details 2205525109
+dbus-send --session --print-reply=literal \
+                    --dest=org.gnome.Shell \
+                    /org/gnome/Shell/Extensions/Windows \
+                    org.gnome.Shell.Extensions.Windows.Details uint32:821316218
 ```
 
 Example result of calling `Details`:
@@ -133,20 +139,41 @@ You can realize the full power of this extension when you use it with `jq` or si
 
 For example, To view all windows in json:
 ```sh
-gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | jq .
+dbus-send --session --print-reply=literal \
+                    --dest=org.gnome.Shell \
+                    /org/gnome/Shell/Extensions/Windows \
+                    org.gnome.Shell.Extensions.Windows.List \
+| jq .
 ```
 To get windowID of all windows in current workspace:
 ```sh
-gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | jq -c '.[] | select (.in_current_workspace == true) | .id'
+dbus-send --session --print-reply=literal \
+                    --dest=org.gnome.Shell \
+                    /org/gnome/Shell/Extensions/Windows \
+                    org.gnome.Shell.Extensions.Windows.List \
+| jq -c '.[] | select (.in_current_workspace == true) | .id'
 ```
 To get windowID and wm_class of all windows in current workspace:
 ```sh
-gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | jq -c '[.[] | select (.in_current_workspace == true) | {id: .id,wm_class: .wm_class}]'
+dbus-send --session --print-reply=literal \
+                    --dest=org.gnome.Shell \
+                    /org/gnome/Shell/Extensions/Windows \
+                    org.gnome.Shell.Extensions.Windows.List \
+| jq -c '[.[] | select (.in_current_workspace == true) | {id: .id,wm_class: .wm_class}]'
 ```
 To get windowID and wm_class of all visible window:
 ```sh
-gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | jq -c '[.[] | select (.frame_type == 0 and .window_type == 0) | {id: .id,wm_class: .wm_class}]'
+dbus-send --session --print-reply=literal \
+                    --dest=org.gnome.Shell \
+                    /org/gnome/Shell/Extensions/Windows \
+                    org.gnome.Shell.Extensions.Windows.List \
+| jq -c '[.[] | select (.frame_type == 0 and .window_type == 0) | {id: .id,wm_class: .wm_class}]'
 ```
 To get windowID and wm_class of all visible window in current workspace:
 ```sh
-gdbus call --session --dest org.gnome.Shell --print-reply=literal --object-path /org/gnome/Shell/Extensions/Windows --method org.gnome.Shell.Extensions.Windows.List | jq -c '[.[] | select (.in_current_workspace == true and .frame_type == 0 and .window_type == 0) | {id: .id,wm_class: .wm_class}]' | jq .
+dbus-send --session --print-reply=literal \
+                    --dest=org.gnome.Shell \
+                    /org/gnome/Shell/Extensions/Windows \
+                    org.gnome.Shell.Extensions.Windows.List \
+| jq -c '[.[] | select (.in_current_workspace == true and .frame_type == 0 and .window_type == 0) | {id: .id,wm_class: .wm_class}]' | jq .
+```
