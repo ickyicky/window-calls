@@ -107,11 +107,26 @@ export default class Extension {
   _get_window_by_wid(winid) {
     let win = global.get_window_actors().find(w => w.meta_window.get_id() == winid);
 
-    if (!w) {
+    if (!win) {
       throw new Error('winid not found');
     }
 
     return win;
+  }
+
+  // GNOME 49+ (Meta 17+) dropped the flags argument of maximize()/unmaximize();
+  // set_maximize_flags() only exists there, so use it to pick the signature.
+  _maximize(mw) {
+    if (mw.set_maximize_flags) mw.maximize(); else mw.maximize(3);
+  }
+
+  _unmaximize(mw) {
+    if (mw.set_maximize_flags) mw.unmaximize(); else mw.unmaximize(3);
+  }
+
+  // Mtk/Meta rectangles are boxed structs and JSON.stringify turns them into {}.
+  _rect(r) {
+    return r ? { x: r.x, y: r.y, width: r.width, height: r.height } : null;
   }
 
   Details(winid) {
@@ -141,7 +156,7 @@ export default class Extension {
 
     const win = {
       in_current_workspace: w.meta_window.located_on_workspace?.(workspaceManager.get_active_workspace?.()),
-      area_cust: w.meta_window.get_work_area_for_monitor?.(currentmonitor)
+      area_cust: this._rect(w.meta_window.get_work_area_for_monitor?.(currentmonitor))
     };
 
     props.get.forEach(name => win[name] = w.meta_window[`get_${name}`]?.());
@@ -149,6 +164,10 @@ export default class Extension {
     props.can.forEach(name => win[`can${name}`] = w.meta_window[`can_${name}`]?.());
     props.has.forEach(name => win[name] = w.meta_window[`has_${name}`]?.());
     props.custom.forEach((fname, name) => { win[name] = w.meta_window[fname]?.() });
+    win.area = this._rect(win.area);
+    win.area_all = this._rect(win.area_all);
+    // get_maximized() is gone in GNOME 49+; is_maximized() replaces it.
+    win.maximized ??= w.meta_window.is_maximized?.();
     let frame = w.meta_window.get_frame_rect();
     props.frame.forEach(name => win[name] = frame[name]);
     
@@ -189,7 +208,8 @@ export default class Extension {
   GetFrameBounds(winid) {
     let w = this._get_window_by_wid(winid);
     const result = {
-      frame_bounds: w.meta_window.get_frame_bounds(),
+      // get_frame_bounds() is gone in GNOME 50.
+      frame_bounds: w.meta_window.get_frame_bounds?.() ?? null,
     }
     return JSON.stringify(result);
   }
@@ -220,7 +240,7 @@ export default class Extension {
     let win = this._get_window_by_wid(winid);
 
     if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
-      win.meta_window.unmaximize(3);
+      this._unmaximize(win.meta_window);
     }
 
     win.meta_window.move_resize_frame(1, x, y, width, height);
@@ -229,7 +249,7 @@ export default class Extension {
   Resize(winid, width, height) {
     let win = this._get_window_by_wid(winid);
     if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
-      win.meta_window.unmaximize(3);
+      this._unmaximize(win.meta_window);
     }
     win.meta_window.move_resize_frame(1, win.get_x(), win.get_y(), width, height);
   }
@@ -237,7 +257,7 @@ export default class Extension {
   Move(winid, x, y) {
     let win = this._get_window_by_wid(winid);
     if (win.meta_window.maximized_horizontally || win.meta_window.maximized_vertically) {
-      win.meta_window.unmaximize(3);
+      this._unmaximize(win.meta_window);
     }
     win.meta_window.move_frame(1, x, y);
   }
@@ -249,7 +269,7 @@ export default class Extension {
 
   Maximize(winid) {
     let win = this._get_window_by_wid(winid).meta_window;
-    win.maximize(3);
+    this._maximize(win);
   }
 
   Minimize(winid) {
@@ -259,7 +279,7 @@ export default class Extension {
 
   Unmaximize(winid) {
     let win = this._get_window_by_wid(winid).meta_window;
-    win.unmaximize(3);
+    this._unmaximize(win);
   }
 
   Unminimize(winid) {
