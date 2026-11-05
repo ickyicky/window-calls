@@ -108,7 +108,7 @@ Example result of calling `Details`:
 Resizing and moving can be done either together or separetely. There are 3 methods providing this functionality:
 
 1. `Resize` which takes 3 parameters: winid width height
-2. `MoveResize` which takes 3 parameters: winid x y width height
+2. `MoveResize` which takes 5 parameters: winid x y width height
 3. `Move` which takes 3 parameters: winid x y
 
 #### Negative parameter values
