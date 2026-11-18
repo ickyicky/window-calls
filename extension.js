@@ -106,8 +106,7 @@ export default class Extension {
 
   _get_window_by_wid(winid) {
     let win = global.get_window_actors().find(w => w.meta_window.get_id() == winid);
-
-    if (!w) {
+    if (!win) {
       throw new Error('winid not found');
     }
 
@@ -151,7 +150,7 @@ export default class Extension {
     props.custom.forEach((fname, name) => { win[name] = w.meta_window[fname]?.() });
     let frame = w.meta_window.get_frame_rect();
     props.frame.forEach(name => win[name] = frame[name]);
-    
+
     return JSON.stringify(win);
   }
 
