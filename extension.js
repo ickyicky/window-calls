@@ -162,6 +162,7 @@ export default class Extension {
     const props = {
       get: ['wm_class', 'wm_class_instance', 'title', 'pid', 'id', 'frame_type', 'window_type', 'width', 'height', 'x', 'y'],
       has: ['focus'],
+      booleans: ["fullscreen"]
       // custom: new Map([])
     };
 
@@ -179,6 +180,7 @@ export default class Extension {
       };
       props.get.forEach(name => win[name] = w.meta_window[`get_${name}`]?.());
       props.has.forEach(name => win[name] = w.meta_window[`has_${name}`]?.());
+      props.booleans.forEach((name) => (win[name] = w.meta_window[name] ?? w.meta_window.is_fullscreen?.()));
       // props.custom.forEach((fname, name) => { win[name] = w.meta_window[fname]?.() });
       return win;
     });
